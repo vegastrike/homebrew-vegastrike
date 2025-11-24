@@ -42,3 +42,20 @@ $ brew tap vegastrike/vegastrike
 |  Formula | Purpose | Install |
 |----------|---------|---------|
 | imgui | ImGui Static library Support | TBD |
+
+## How do I install these formulae?
+
+`brew install vegastrike/vegastrike/<formula>`
+
+Or `brew tap vegastrike/vegastrike` and then `brew install <formula>`.
+
+Or, in a `brew bundle` `Brewfile`:
+
+```ruby
+tap "vegastrike/vegastrike"
+brew "<formula>"
+```
+
+## Documentation
+
+`brew help`, `man brew` or check [Homebrew's documentation](https://docs.brew.sh).
