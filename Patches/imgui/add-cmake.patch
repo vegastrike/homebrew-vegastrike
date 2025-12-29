@@ -1,0 +1,398 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 000000000..b9b73bd02
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,321 @@
++# Date: 2025-12-29 1600 EST
++# https://raw.githubusercontent.com/microsoft/vcpkg/b02e341c927f16d991edbd915d8ea43eac52096c/ports/imgui/CMakeLists.txt
++# under https://github.com/microsoft/vcpkg/blob/master/LICENSE.txt copied below:
++# MIT License
++# 
++# Copyright (c) Microsoft Corporation
++# 
++# Permission is hereby granted, free of charge, to any person obtaining a copy of this
++# software and associated documentation files (the "Software"), to deal in the Software
++# without restriction, including without limitation the rights to use, copy, modify,
++# merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
++# permit persons to whom the Software is furnished to do so, subject to the following
++# conditions:
++# 
++# The above copyright notice and this permission notice shall be included in all copies
++# or substantial portions of the Software.
++# 
++# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
++# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
++# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
++# CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
++# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++
++CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
++PROJECT(imgui CXX)
++
++SET(CMAKE_DEBUG_POSTFIX d)
++
++IF(APPLE)
++    SET(CMAKE_CXX_STANDARD 11)
++    ENABLE_LANGUAGE(OBJCXX)
++ENDIF()
++
++ADD_LIBRARY(${PROJECT_NAME} "")
++ADD_LIBRARY(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
++TARGET_INCLUDE_DIRECTORIES(
++    ${PROJECT_NAME}
++    PUBLIC
++        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_SOURCE_DIR}/test-engine>"
++        $<INSTALL_INTERFACE:include>
++)
++
++TARGET_SOURCES(
++    ${PROJECT_NAME}
++    PRIVATE
++        ${CMAKE_CURRENT_SOURCE_DIR}/imgui.cpp
++        ${CMAKE_CURRENT_SOURCE_DIR}/imgui_demo.cpp
++        ${CMAKE_CURRENT_SOURCE_DIR}/imgui_draw.cpp
++        ${CMAKE_CURRENT_SOURCE_DIR}/imgui_tables.cpp
++        ${CMAKE_CURRENT_SOURCE_DIR}/imgui_widgets.cpp
++        ${CMAKE_CURRENT_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
++)
++
++TARGET_COMPILE_FEATURES(${PROJECT_NAME} PUBLIC cxx_std_11)
++
++IF(IMGUI_BUILD_ALLEGRO5_BINDING)
++    FIND_PACKAGE(Allegro CONFIG REQUIRED)
++    TARGET_LINK_LIBRARIES(${PROJECT_NAME} PRIVATE Allegro::allegro Allegro::allegro_ttf Allegro::allegro_font Allegro::allegro_main)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_allegro5.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_ANDROID_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_android.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_DX9_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_dx9.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_DX10_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_dx10.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_DX11_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_dx11.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_DX12_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_dx12.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_GLFW_BINDING)
++    IF(NOT EMSCRIPTEN)
++        FIND_PACKAGE(glfw3 CONFIG REQUIRED)
++        TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC glfw)
++    ENDIF()
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_glfw.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_GLUT_BINDING)
++    FIND_PACKAGE(GLUT REQUIRED)
++    TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC GLUT::GLUT)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_glut.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_METAL_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_metal.mm)
++    SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_metal.mm PROPERTIES COMPILE_FLAGS -fobjc-weak)
++ENDIF()
++
++IF(IMGUI_BUILD_OPENGL2_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_opengl2.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_OPENGL3_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_OSX_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_osx.mm)
++ENDIF()
++
++IF(IMGUI_BUILD_SDL3_BINDING)
++    FIND_PACKAGE(SDL3 CONFIG REQUIRED)
++    TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC SDL3::SDL3)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_SDLGPU3_BINDING)
++    FIND_PACKAGE(SDL3 CONFIG REQUIRED)
++    TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC SDL3::SDL3)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_SDL3_RENDERER_BINDING)
++    FIND_PACKAGE(SDL3 CONFIG REQUIRED)
++    TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC SDL3::SDL3)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_VULKAN_BINDING)
++    FIND_PACKAGE(Vulkan REQUIRED)
++    TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp)
++ENDIF()
++
++IF(IMGUI_BUILD_WIN32_BINDING)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_win32.cpp)
++ENDIF()
++
++IF(IMGUI_FREETYPE)
++    FIND_PACKAGE(freetype CONFIG REQUIRED)
++    TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC freetype)
++    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/misc/freetype/imgui_freetype.cpp)
++    TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC IMGUI_ENABLE_FREETYPE)
++ENDIF()
++
++IF(IMGUI_FREETYPE_SVG)
++    FIND_PACKAGE(plutosvg CONFIG REQUIRED)
++    TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC plutosvg::plutosvg)
++    TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC IMGUI_ENABLE_FREETYPE_PLUTOSVG)
++ENDIF()
++
++IF(IMGUI_USE_WCHAR32)
++    TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC IMGUI_USE_WCHAR32)
++ENDIF()
++
++IF(IMGUI_TEST_ENGINE)
++    FIND_PACKAGE(Stb REQUIRED)
++    TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE ${Stb_INCLUDE_DIR})
++    TARGET_SOURCES(
++        ${PROJECT_NAME}
++        PRIVATE
++            ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_capture_tool.cpp
++            ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_context.cpp
++            ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_coroutine.cpp
++            ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_engine.cpp
++            ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_exporters.cpp
++            ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_perftool.cpp
++            ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_ui.cpp
++            ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_utils.cpp
++    )
++ENDIF()
++
++LIST(REMOVE_DUPLICATES BINDINGS_SOURCES)
++
++INSTALL(
++    TARGETS ${PROJECT_NAME}
++    EXPORT ${PROJECT_NAME}_target
++    ARCHIVE DESTINATION lib
++    LIBRARY DESTINATION lib
++    RUNTIME DESTINATION bin
++)
++
++FOREACH(BINDING_TARGET ${BINDING_TARGETS})
++    INSTALL(
++        TARGETS ${BINDING_TARGET}
++        EXPORT ${PROJECT_NAME}_target
++        ARCHIVE DESTINATION lib
++        LIBRARY DESTINATION lib
++        RUNTIME DESTINATION bin
++    )
++ENDFOREACH()
++
++IF(NOT IMGUI_SKIP_HEADERS)
++    INSTALL(FILES
++        ${CMAKE_CURRENT_SOURCE_DIR}/imgui.h
++        ${CMAKE_CURRENT_SOURCE_DIR}/imconfig.h
++        ${CMAKE_CURRENT_SOURCE_DIR}/imgui_internal.h
++        ${CMAKE_CURRENT_SOURCE_DIR}/imstb_textedit.h
++        ${CMAKE_CURRENT_SOURCE_DIR}/imstb_rectpack.h
++        ${CMAKE_CURRENT_SOURCE_DIR}/imstb_truetype.h
++        ${CMAKE_CURRENT_SOURCE_DIR}/misc/cpp/imgui_stdlib.h
++        DESTINATION include
++    )
++
++    IF(IMGUI_BUILD_ALLEGRO5_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_allegro5.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_ANDROID_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_android.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_DX9_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_dx9.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_DX10_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_dx10.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_DX11_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_dx11.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_DX12_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_dx12.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_GLFW_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_glfw.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_GLUT_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_glut.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_METAL_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_metal.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_OPENGL2_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_opengl2.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_OPENGL3_BINDING)
++        INSTALL(
++            FILES
++                ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_opengl3.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_opengl3_loader.h
++            DESTINATION
++                include
++        )
++    ENDIF()
++
++    IF(IMGUI_BUILD_OSX_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_osx.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_SDL3_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_sdl3.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_SDLGPU3_BINDING)
++        INSTALL(
++            FILES
++                ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_sdlgpu3_shaders.h
++            DESTINATION
++                include
++        )
++    ENDIF()
++
++    IF(IMGUI_BUILD_SDL3_RENDERER_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_VULKAN_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_vulkan.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_BUILD_WIN32_BINDING)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_win32.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_FREETYPE)
++        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/freetype/imgui_freetype.h DESTINATION include)
++    ENDIF()
++
++    IF(IMGUI_TEST_ENGINE)
++        INSTALL(
++            FILES
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_capture_tool.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_context.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_coroutine.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_engine.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_exporters.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_imconfig.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_internal.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_perftool.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_ui.h
++                ${CMAKE_CURRENT_SOURCE_DIR}/test-engine/imgui_te_utils.h
++            DESTINATION
++                include
++        )
++    ENDIF()
++ENDIF()
++
++INCLUDE(CMakePackageConfigHelpers)
++CONFIGURE_PACKAGE_CONFIG_FILE(imgui-config.cmake.in imgui-config.cmake INSTALL_DESTINATION share/imgui)
++
++INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/imgui-config.cmake DESTINATION share/imgui)
++
++INSTALL(
++    EXPORT ${PROJECT_NAME}_target
++    NAMESPACE ${PROJECT_NAME}::
++    FILE ${PROJECT_NAME}-targets.cmake
++    DESTINATION share/${PROJECT_NAME}
++)
+diff --git a/imgui-config.cmake.in b/imgui-config.cmake.in
+new file mode 100644
+index 000000000..95353d2bd
+--- /dev/null
++++ b/imgui-config.cmake.in
+@@ -0,0 +1,65 @@
++# Date: 2025-12-29 1620 EST
++# https://raw.githubusercontent.com/microsoft/vcpkg/b02e341c927f16d991edbd915d8ea43eac52096c/ports/imgui/imgui-config.cmake.in 
++# under https://github.com/microsoft/vcpkg/blob/master/LICENSE.txt copied below:
++# MIT License
++# 
++# Copyright (c) Microsoft Corporation
++# 
++# Permission is hereby granted, free of charge, to any person obtaining a copy of this
++# software and associated documentation files (the "Software"), to deal in the Software
++# without restriction, including without limitation the rights to use, copy, modify,
++# merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
++# permit persons to whom the Software is furnished to do so, subject to the following
++# conditions:
++# 
++# The above copyright notice and this permission notice shall be included in all copies
++# or substantial portions of the Software.
++# 
++# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
++# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
++# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
++# CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
++# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++
++CMAKE_POLICY(SET CMP0012 NEW)
++
++@PACKAGE_INIT@
++
++INCLUDE(CMakeFindDependencyMacro)
++
++IF(@IMGUI_BUILD_GLFW_BINDING@)
++    IF(NOT "@EMSCRIPTEN@")
++        FIND_DEPENDENCY(glfw3 CONFIG)
++    ENDIF()
++ENDIF()
++
++IF(@IMGUI_BUILD_GLUT_BINDING@)
++    FIND_DEPENDENCY(GLUT)
++ENDIF()
++
++IF(@IMGUI_BUILD_SDL3_BINDING@ OR @IMGUI_BUILD_SDL3_RENDERER_BINDING@ OR @IMGUI_BUILD_SDLGPU3_BINDING@)
++    FIND_DEPENDENCY(SDL3 CONFIG)
++ENDIF()
++
++IF(@IMGUI_BUILD_VULKAN_BINDING@)
++    FIND_DEPENDENCY(Vulkan)
++ENDIF()
++
++IF(@IMGUI_FREETYPE@)
++    FIND_DEPENDENCY(freetype CONFIG)
++ENDIF()
++
++IF(@IMGUI_FREETYPE_SVG@)
++    FIND_DEPENDENCY(plutosvg CONFIG)
++ENDIF()
++
++IF(@IMGUI_BUILD_ALLEGRO5_BINDING@)
++    FIND_DEPENDENCY(Allegro CONFIG)
++ENDIF()
++
++IF(@IMGUI_TEST_ENGINE@)
++    FIND_DEPENDENCY(Stb)
++ENDIF()
++
++INCLUDE("${CMAKE_CURRENT_LIST_DIR}/imgui-targets.cmake")
